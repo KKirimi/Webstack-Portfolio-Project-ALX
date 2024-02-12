@@ -1,6 +1,5 @@
 from uuid import uuid4
 from datetime import datetime
-import models
 
 
 class BaseModel:
@@ -21,31 +20,20 @@ to_dict: Returns a dictionary representation of the object.
 """
 
 
-def __init__(self, *args, **kwargs):
-    """Public instance artributes initialization
-    after creation
-
-    Args:
-        *args(args): arguments
-        **kwargs(dict): attrubute values
-    """
-
-
 DATE_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
+
+
+def __init__(self, *args, **kwargs):
+    """Public instance artributes initialization after creation"""
+
+
 if not kwargs:
     self.id = str(uuid4())
     self.created_at = datetime.utcnow()
     self.updated_at = datetime.utcnow()
-    models.storage.new(self)
 else:
     for key, value in kwargs.items():
-        if key in ("updated_at", "created_at"):
-            self.__dict__[key] = datetime.strptime(
-                            value, DATE_TIME_FORMAT)
-        elif key[0] == "id":
-            self.__dict__[key] = str(value)
-        else:
-            self.__dict__[key] = value
+        setattr(self, key, value)
 
 
 def __str__(self):
@@ -57,7 +45,6 @@ def __str__(self):
 def save(self):
     """Updates the 'updated_at' attribute with the current datetime."""
     self.updated_at = datetime.utcnow()
-    models.storage.save()
 
 
 def to_dict(self):
@@ -70,11 +57,8 @@ def to_dict(self):
     """
 
 
-obj_dict = {}
-for key, value in self.__dict__.items()
-if key == "created_at" or key == "updated_at":
-    obj_dict[key] = value.isoformat()
-else:
-    obj_dict[key] = value
-    obj_dict["__class__"] = self.__class__.__name__
+obj_dict = self.__dict__.copy()
+obj_dict['created_at'] = obj_dict['created_at'].strftime(self.DATE_TIME_FORMAT)
+obj_dict['updated_at'] = obj_dict['updated_at'].strftime(self.DATE_TIME_FORMAT)
+OBJ_DICT["__class__"] = self.__class__.__name__
 return obj_dict
