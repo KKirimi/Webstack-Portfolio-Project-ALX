@@ -1,5 +1,6 @@
-import uuid
+import uuid import uuid4
 from datetime import datetime
+import models
 
 
 class BaseModel:
@@ -9,7 +10,7 @@ class BaseModel:
 
 Attributes:
 id (str): A unique identifier for each instance generated using uuid.uuid4().
-created-at (datetime): The datetime when the instance is created.
+created_at (datetime): The datetime when the instance is created.
 updated_at (datetime): The datetime when the instance is last updated.
 
 Methods:
@@ -20,11 +21,31 @@ to_dict: Returns a dictionary representation of the object.
 """
 
 
-def __init__(self):
-    """Initializes a new instance of the BaseModel class."""
-    self.id = str(uuid.uuid4())  # Generate a unique ID for the instance as str
-    self.created_at = datetime.now()  # Record creation time
-    self.updated_at = datetime.now()  # Record last update time
+def __init__(self, *args, **kwargs):
+    """Public instance artributes initialization
+    after creation
+
+    Args:
+        *args(args): arguments
+        **kwargs(dict): attrubute values
+    """
+
+
+DATE_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
+if not kwargs:
+    self.id = str(uuid4())
+    self.created_at = datetime.utcnow()
+    self.updated_at = datetime.utcnow()
+    models.storage.new(self)
+else:
+    for key, value in kwargs.items():
+        if key in ("updated_at", "created_at"):
+            self.__dict__[key] = datetime.strptime(
+                            value, DATE_TIME_FORMAT)
+        elif key[0] == "id":
+            self.__dict__[key] = str(value)
+        else:
+            self.__dict__[key] = value
 
 
 def __str__(self):
@@ -35,7 +56,8 @@ def __str__(self):
 
 def save(self):
     """Updates the 'updated_at' attribute with the current datetime."""
-    self.updated_at = datetime.now()
+    self.updated_at = datetime.utcnow()
+    models.storage.save()
 
 
 def to_dict(self):
@@ -46,8 +68,13 @@ def to_dict(self):
     'The created_at' and 'updated_at' values are converted
     to ISO format strings.
     """
-    obj_dict = self.__dict__.copy()
-    obj_dict['__class__'] = self.__class__.__name__  # Add class name to dict
-    obj_dict['created_at'] = self.created_at.isoformat()  # Convert t to ISO
-    obj_dict['updated_at'] = self.updated_at.isoformat()  # Convert t to ISO
-    return obj_dict
+
+
+obj_dict = {}
+for key, value in self.__dict__.items()
+if key == "created_at" or key == "updated_at":
+    obj_dict[key] = value.isoformat()
+else:
+    obj_dict[key] = value
+    obj_dict["__class__"] = self.__class__.__name__
+return obj_dict
