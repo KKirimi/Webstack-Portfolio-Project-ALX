@@ -27,13 +27,14 @@ def __init__(self, *args, **kwargs):
     """Public instance artributes initialization after creation"""
 
 
-if not kwargs:
-    self.id = str(uuid4())
-    self.created_at = datetime.utcnow()
-    self.updated_at = datetime.utcnow()
-else:
+if kwargs:
     for key, value in kwargs.items():
-        setattr(self, key, value)
+        if key == 'created_at' or key == 'updated_at':
+            setattr(self, key, datetime.strptime(value, self.DATE_TIME_FORMAT))
+    else:
+        self.id = str(uuid4())
+        self.created_at = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
 
 
 def __str__(self):
