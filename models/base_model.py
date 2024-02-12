@@ -3,6 +3,8 @@ from uuid import uuid4
 from datetime import datetime
 import models
 
+time = "%Y-%m-%dT%H:%M:%S.%f"
+
 
 class BaseModel:
 
@@ -22,21 +24,28 @@ to_dict: Returns a dictionary representation of the object.
 """
 
 
-DATE_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
-
-
 def __init__(self, *args, **kwargs):
     """Public instance artributes initialization after creation"""
 
 
 if kwargs:
     for key, value in kwargs.items():
-        if key == 'created_at' or key == 'updated_at':
-            setattr(self, key, datetime.strptime(value, self.DATE_TIME_FORMAT))
-    else:
-        self.id = str(uuid4())
-        self.created_at = datetime.utcnow()
-        self.updated_at = datetime.utcnow()
+        if key != "__class__":
+            setattr(self, key, value)
+        if kwargs.get("created_at", None) and type(self.created_at) is str:
+            self.created_at = datetime.strptime(kwargs["created_at"])
+        else:
+            self.created_at = datetime.utcnow()
+        if kwargs.get("updated_at", None) and type(self.updated_at) is str:
+            self.updated_at = datetime.strptime(kwargs["updated_at"], time)
+        else:
+            self.updated_at = datetime.utcnow()
+        if kwargs.get("id", None) is None:
+            self.id = str(uuid.uuid4())
+        else:
+            self.id = str(uuid4())
+            self.created_at = datetime.utcnow()
+            self.updated_at = self.created_at
 
 
 def __str__(self):
@@ -48,6 +57,8 @@ def __str__(self):
 def save(self):
     """Updates the 'updated_at' attribute with the current datetime."""
     self.updated_at = datetime.utcnow()
+    models.storage.new(self)
+    models.storage.save()
 
 
 def to_dict(self):
@@ -61,7 +72,9 @@ def to_dict(self):
 
 
 obj_dict = self.__dict__.copy()
-obj_dict['created_at'] = obj_dict['created_at'].strftime(self.DATE_TIME_FORMAT)
-obj_dict['updated_at'] = obj_dict['updated_at'].strftime(self.DATE_TIME_FORMAT)
+if "created_at" in obj_dict:
+    obj_dict['created_at'] = obj_dict['created_at'].strftime(time)
+if "updated_at" in obj_dict:
+    obj_dict['updated_at'] = obj_dict['updated_at'].strftime(time)
 obj_dict["__class__"] = self.__class__.__name__
 return obj_dict
