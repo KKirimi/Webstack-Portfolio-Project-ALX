@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import unittest
 import uuid
+import os
 from models.base_model import BaseModel
 from datetime import datetime
 
