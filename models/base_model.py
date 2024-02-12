@@ -60,5 +60,5 @@ def to_dict(self):
 obj_dict = self.__dict__.copy()
 obj_dict['created_at'] = obj_dict['created_at'].strftime(self.DATE_TIME_FORMAT)
 obj_dict['updated_at'] = obj_dict['updated_at'].strftime(self.DATE_TIME_FORMAT)
-OBJ_DICT["__class__"] = self.__class__.__name__
+obj_dict["__class__"] = self.__class__.__name__
 return obj_dict
