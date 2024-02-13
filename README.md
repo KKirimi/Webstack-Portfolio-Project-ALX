@@ -1,3 +1,5 @@
+0x00. AirBnB clone - The console
+=======
 The goal of the project is to deploy on our server a simple copy of the AirBnB website. The complete web applicationwill be composed by:
 	1. A command interpreter to manipulate data without a visual interface (perfect for development and debugging)
 	2. A website (the front-end) that shows the final product to everybody: static and dynamic.
@@ -23,4 +25,4 @@ How to start the command interpreter:
 How to use the command interpreter:
 
 
-Examples: 
+Examples:
