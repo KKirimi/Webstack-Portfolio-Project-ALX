@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import uuid
 from datetime import datetime
-from models import storage
 
 
 class BaseModel:
@@ -12,6 +11,7 @@ class BaseModel:
         Initialize a new instance of the BaseModel class.
         *args, **kwargs arguments for the constructor of a BaseModel
         '''
+        from models import storage
         if kwargs:
             for key, value in kwargs.items():
                 if key == '__class__':
@@ -34,6 +34,7 @@ class BaseModel:
 
     def save(self):
         '''Updates updated_at with the current datetime.'''
+        from models import storage
         self.updated_at = datetime.now()
         storage.save()
 
